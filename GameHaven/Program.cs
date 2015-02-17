@@ -31,13 +31,21 @@ namespace GameHaven
             // main loop through data to get card info
             List<MagicCard> cards = DataHelper.GetMagicCardsFromData(
                 dataRange,
-                headerRange);
+                headerRange,
+                null);
 
             // since we have a lot of double rows, group by name
             List<MagicCard> cardTotals = DataHelper.GroupCardsByName(cards);
 
             // finally we can output results
-            DataHelper.WriteToHtmlFile(cardTotals, CASH_FACTOR);
+            FileStream stream = new FileStream(
+                string.Format(
+                    @"C:\MyProjects\GameHaven\testfile_{0}{1}{2}.html",
+                    DateTime.Today.Year,
+                    DateTime.Today.Month,
+                    DateTime.Today.Day), 
+                FileMode.OpenOrCreate);
+            DataHelper.WriteToHtmlFile(stream, cardTotals, CASH_FACTOR);
 
             //Console.Read();
             book.Close();

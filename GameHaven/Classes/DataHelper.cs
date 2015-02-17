@@ -6,10 +6,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Excel = Microsoft.Office.Interop.Excel;
 using System.IO;
+using System.Windows.Forms;
 
 namespace GameHaven
 {
-    class DataHelper
+    public class DataHelper
     {
         const int THRESHOLD = 2;
 
@@ -92,8 +93,15 @@ namespace GameHaven
         }
 
         public static List<MagicCard> GetMagicCardsFromData(Excel.Range dataRange,
-            Excel.Range headerRange)
+            Excel.Range headerRange, ProgressBar bar)
         {
+            if (bar != null)
+            {
+                bar.Minimum = 1;
+                bar.Maximum = dataRange.Rows.Count;
+                bar.Value = 1;
+                bar.Step = 1;
+            }
             List<MagicCard> cards = new List<MagicCard>();
             Debug.WriteLine(dataRange.Address);
             int headerRow = Convert.ToInt32(
@@ -177,6 +185,7 @@ namespace GameHaven
                     Quantity = qty,
                     Price = price
                 });
+                if (bar != null) bar.PerformStep();
             }
             return cards;
         }
@@ -221,7 +230,8 @@ namespace GameHaven
             return cardTotals;
         }
 
-        public static void WriteToHtmlFile(List<MagicCard> cards, double factor)
+        public static void WriteToHtmlFile(FileStream fileStream, List<MagicCard> cards, 
+            double factor)
         {
             StringBuilder htmlString = new StringBuilder();
             htmlString.Append(
@@ -271,12 +281,7 @@ namespace GameHaven
             }
 
             htmlString.Append("</table></body></html>");
-            using (StreamWriter file = new StreamWriter(
-                String.Format(
-                    @"C:\MyProjects\GameHaven\testfile_{0}{1}{2}.html", 
-                        DateTime.Today.Year, 
-                        DateTime.Today.Month, 
-                        DateTime.Today.Day)))
+            using (StreamWriter file = new StreamWriter(fileStream))
             {
                 file.Write(htmlString.ToString());
             }

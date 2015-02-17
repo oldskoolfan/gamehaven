@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GameHaven
 {
-    class MagicCard
+    public class MagicCard
     {
         public int UnitOfMeasure { get; set; }
         public string Name { get; set; }
